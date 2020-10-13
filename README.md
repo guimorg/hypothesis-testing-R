@@ -13,10 +13,6 @@ In order to run these scripts/notebooks you will need to install a few programs 
 
 One thing you could do would be installing [Anaconda](https://docs.anaconda.com/anaconda/install/) that will provide you most of the tools you need (especially if you're working in a Windows machine), but you can install it as you want. 
 
-## Statistical Tests
-
-You will find more information on the notebooks provided in this repository, but we are going to see how to use the following tests:
-
 ## References
 
 These are some references used when writing this material and can also be used for further exploration of these techniques:
