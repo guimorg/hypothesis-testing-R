@@ -65,7 +65,15 @@ mtcars.mpg.fam.diff <- round(mtcars.t.test$estimate[1] - mtcars.t.test$estimate[
 conf.level <- attr(mtcars.t.test$conf.int, "conf.level") * 100
 
 # RStudio
-Our study finds that engines yields on average `r mtcars.mpg.fam.diff` miles/gallong in the automatic transmission group compared to the manual transmission group (t-statistic `r round(mtcars.t.test$statistic, 2)`, p=`r round(mtcars.t.test$p.value, 3)`, `r conf.level`% CI [`r round(mtcars.t.test$conf.int,1)`]g)
+sprintf(
+    "Our study finds that engines yields on average %.3f miles/gallon in the automatic transmission group compared to the manual transmission group (t-statistic %.3f, p=%.3f, %.0f %% CI [%.3f %.3f]miles/gallon",
+    mtcars.mpg.fam.diff,
+    mtcars.t.test$statistic,
+    mtcars.t.test$p.value,
+    conf.level,
+    mtcars.t.test$conf.int[1],
+    mtcars.t.test$conf.int[2]
+)
 
 t.test(mpg ~ fam, var.eq = T)
 
