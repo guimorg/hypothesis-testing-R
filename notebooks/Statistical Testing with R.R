@@ -10,9 +10,17 @@ head(mtcars)
 # data(mtcars)
 
 ?mtcars
-# Is the same as help(mtcars)
 
 # Getting statistical information about each variable
+summary(mtcars)
+
+mtcars$vs <- factor(mtcars$vs, levels = c(0, 1), labels = c("v-shaped", "straight"))
+mtcars$am <- factor(mtcars$am, levels = c(0, 1), labels = c("automatic", "manual"))
+mtcars$gear <- factor(mtcars$gear)
+mtcars$carb <- factor(mtcars$carb)
+mtcars$cyl <- factor(mtcars$cyl)
+attach(mtcars)
+
 summary(mtcars)
 
 # To check for the covariation we will use a very simple approach of a scatter plot
@@ -32,42 +40,39 @@ abline(lm(y ~ x, data = mtcars), col = "blue")
 
 # First, let's test for the weight (x)
 shapiro.test(x)
+
 shapiro.test(y)
 
 par(mfrow=c(1,2))
-qqnorm(x); qqline(x)
-qqnorm(y); qqline(y)
+qqnorm(x, main="Normal Q-Q Plot wt"); qqline(x)
+qqnorm(y, main="Normal Q-Q Plot mpg"); qqline(y)
+
+par(mfrow=c(1,2))
+hist(x,  main = "Histogram wt")
+hist(y,  main = "Histogram mpg")
 
 cor.test(x, y, method="pearson")
 
-# Here we are only making the values more human-readable
-mtcars$fam <- factor(mtcars$am, levels=c(0,1), labels=c("automatic","manual"))
+summary(mtcars$am)
 
-summary(mtcars$fam)
+shapiro.test(mpg)
 
-attach(mtcars)  # Need to reattach because of new variable
+qqnorm(mpg, main="Normal Q-Q Plot mpg"); qqline(mpg)
+hist(mpg,  main = "Histogram manual Fuel Consumption")
 
-shapiro.test(mpg[fam == "manual"])
-shapiro.test(mpg[fam == "automatic"])
+boxplot(mpg~am, ylab="Miles/Gallon", xlab="Transmission")
 
-par(mfrow=c(1,2))
-qqnorm(mpg[fam == "manual"]); qqline(mpg[fam == "manual"])
-qqnorm(mpg[fam == "automatic"]); qqline(mpg[fam == "automatic"])
-
-boxplot(mpg ~ fam, ylab="Miles/Gallon", xlab="Transmission")
-
-mtcars.t.test <- t.test(mpg ~ fam)
+mtcars.t.test <- t.test(mpg ~ am)
 mtcars.t.test
 
-mtcars.mpg.fam.diff <- round(mtcars.t.test$estimate[1] - mtcars.t.test$estimate[2], 1)
+mtcars.mpg.am.diff <- round(mtcars.t.test$estimate[1] - mtcars.t.test$estimate[2], 1)
 
 # Confidence level as a %
 conf.level <- attr(mtcars.t.test$conf.int, "conf.level") * 100
 
-# RStudio
 sprintf(
     "Our study finds that engines yields on average %.3f miles/gallon in the automatic transmission group compared to the manual transmission group (t-statistic %.3f, p=%.3f, %.0f %% CI [%.3f %.3f]miles/gallon",
-    mtcars.mpg.fam.diff,
+    mtcars.mpg.am.diff,
     mtcars.t.test$statistic,
     mtcars.t.test$p.value,
     conf.level,
@@ -75,17 +80,14 @@ sprintf(
     mtcars.t.test$conf.int[2]
 )
 
-t.test(mpg ~ fam, var.eq = T)
+t.test(mpg ~ am, var.eq = T)
+t.test(mpg~am, var.eq = T, alternative = "less")
 
-t.test(mpg~fam, var.eq = T, alternative = "less")
-
-shapiro.test(hp[fam == "manual"])
-
-shapiro.test(hp[fam == "automatic"])
-
-boxplot(hp ~ fam)
-
-wilcox.test(hp ~ fam, mu=0, alt="two.sided", conf.int=T, conf.level=0.95, paired=F, exact=F)
+qqnorm(hp, main="Normal Q-Q Plot hp"); qqline(hp)
+hist(hp)
+shapiro.test(hp)
+boxplot(hp ~ am)
+wilcox.test(hp ~ am, mu=0, alt="two.sided", conf.int=T, conf.level=0.95, paired=F, exact=F)
 
 mtcars$cyl <- as.factor(mtcars$cyl)
 attach(mtcars)
@@ -94,9 +96,9 @@ attach(mtcars)
 contingency <- table(carb, cyl)
 
 contingency
+prop.table(contingency)
 
 chisq.test(contingency)
-
 fisher.test(contingency)
 
 summary(aov(lm(mpg~.,data=mtcars)))
@@ -106,9 +108,8 @@ fit1 <- lm(mpg ~ am + cyl, data=mtcars)
 fit2 <- lm(mpg ~ am + cyl + disp, data=mtcars)
 fit3 <- lm(mpg ~ am + cyl + disp + wt, data=mtcars)
 fit4 <- lm(mpg ~ am + cyl + disp + wt + hp, data=mtcars)
-anovaTable <- anova(fit, fit1, fit2, fit3, fit4)
 
+anovaTable <- anova(fit, fit1, fit2, fit3, fit4)
 anovaTable
 
 finalfit <- lm(mpg ~ am + cyl + wt + disp + wt + hp, data=mtcars); summary(finalfit)
-
